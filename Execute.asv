@@ -1,0 +1,234 @@
+function []= Execute()
+
+resolution=40;  
+K=0;                  
+c=1;
+
+while K~=12 % arrêter
+   K=menu('Que voulez-vous faire ?','Hermite  (bouton souris, puis <ENTER>', 'Hermite + Courbe focale','Hermite + courbure','Lagrange','Papillon','Courbe C2','Heart','Flower','Cercle','superposition des 3 courbes','Hermite + C2 + Courbures','ARRETER')
+   if K==1 % NEW
+      clf                  
+      hold on              
+      axis([0 10 0 10])    % les axes sont definitivement fixes
+      %axis off
+      % on recupere la valeur de c
+      prompt = {'Entrez la valeur de c:'};
+      dlgtitle = 'Input';
+      dims = [1 30];
+      definput = {''};
+      c = str2double(inputdlg(prompt,dlgtitle,dims,definput));
+      matrice=0;
+      for i=1:1000         
+         [X,Y]=ginput(1);  % prise en compte d'un clic de souris
+         if isempty(X)     % si on appuie sur <ENTER>
+            break
+         end
+         matrice(1,i)=X;   
+         matrice(2,i)=Y;   
+         plot(matrice(1,i),matrice(2,i),'o');
+     end
+      
+      matricep = calcule_m(matrice, c, 0);
+      
+      Hermite(matrice, matricep, resolution, 1);
+      
+   elseif K==2 
+      clf                  
+      hold on              
+      axis([0 10 0 10])    
+      %axis off
+      prompt = {'Entrez la valeur de c:'};
+      dlgtitle = 'Input';
+      dims = [1 30];
+      definput = {''};
+      c = str2double(inputdlg(prompt,dlgtitle,dims,definput));
+      matrice=0;
+      for i=1:1000         
+         [X,Y]=ginput(1);  
+         if isempty(X)     
+            break
+         end
+         matrice(1,i)=X;   
+         matrice(2,i)=Y;   
+         plot(matrice(1,i),matrice(2,i),'o') 
+         %plot(matrice(1,:),matrice(2,:),'b') 
+      end
+      
+      matricep = calcule_m(matrice, c, 0);
+      
+      Hermite(matrice, matricep, resolution, 0);
+      courbure_points = courbe_focale(matrice, matricep);
+      plot(courbure_points(1,:), courbure_points(2,:), 'b');
+      
+   elseif K==3
+      clf                  
+      hold on              
+      axis([0 10 0 10])    
+      %axis off
+      matrice=0;
+      for i=1:1000         
+         [X,Y]=ginput(1);  
+         if isempty(X)     
+            break
+         end
+         matrice(1,i)=X;   
+         matrice(2,i)=Y;   
+         plot(matrice(1,i),matrice(2,i),'o') 
+         %plot(matrice(1,:),matrice(2,:),'b') 
+      end
+      
+      matricep = calcule_m(matrice, c, 0);
+      %matriced = calcule_m(matrice, c, 1);
+      Hermite(matrice, matricep, resolution, 0);
+      %Hermite(matrice, matriced, resolution, 0);
+      figure
+      hold on
+      courbure(matrice, matricep);
+      %courbure(matrice, matriced);
+   elseif K==4 
+      
+      clf                  
+      hold on              
+      axis([0 10 0 10])    
+      %axis off
+      matrice=0;
+      for i=1:1000         
+         [X,Y]=ginput(1);  
+         if isempty(X)     
+            break
+         end
+         matrice(1,i)=X;   
+         matrice(2,i)=Y;   
+         plot(matrice(1,i),matrice(2,i),'o') % affichage du point de controle i
+         plot(matrice(1,:),matrice(2,:),'b') % affichage du polygone de controle
+      end
+      
+      Lagrange(matrice, resolution);
+   
+   elseif K==5
+      clf                  
+      hold on              
+      axis([-1 10 -1 10])
+      axis off
+      res = 200;
+      matrice = butterfly(10,10, res);
+      
+      matricep = calcule_m(matrice, c, 0);
+      
+      Hermite(matrice, matricep, res, 0);
+      %Lagrange(matrice, res);
+      %courbe_C2(matrice, 5*res);
+      
+   elseif K==6
+      clf                  
+      hold on              
+      axis([-1 10 -1 10])
+      matrice=0;
+      for i=1:1000         
+         [X,Y]=ginput(1);  
+         if isempty(X)     
+            break
+         end
+         matrice(1,i)=X;   
+         matrice(2,i)=Y;   
+         plot(matrice(1,i),matrice(2,i),'o') % affichage du point de controle i
+         %plot(matrice(1,:),matrice(2,:),'b') % affichage du polygone de controle
+      end
+      
+      courbe_C2(matrice, resolution);
+      matriced = transpose(calcule_points_aux(matrice));
+      figure
+      hold on
+      courbure(matrice, matriced);
+      
+   elseif K==7
+      clf                  
+      hold on              
+      %axis([-1 10 -1 10])
+      axis off
+      res = 50;
+      matrice = heart(10,10, res);
+      
+      matricep = calcule_m(matrice, c, 0);
+      
+      Hermite(matrice, matricep, res, 0);
+      %Lagrange(matrice, res);
+      %courbe_C2(matrice, 5*res);
+      
+   elseif K==8
+      clf                  
+      hold on              
+      %axis([-1 10 -1 10])
+      axis off
+      res = 100;
+      matrice = flower(10,10, res);
+      
+      matricep = calcule_m(matrice, c, 0);
+      
+      Hermite(matrice, matricep, res, 0);
+      %Lagrange(matrice, res);
+      %courbe_C2(matrice, 5*res);
+   
+   elseif K==9
+      clf                  
+      hold on              
+      %axis([-1 10 -1 10])
+      axis off
+      res = 40;
+      matrice = Cercle(10,10, 10);
+      
+      matricep = calcule_m(matrice, c, 0);
+      
+      Hermite(matrice, matricep, res, 0);
+      %courbe_C2(matrice, 5*res);
+      %Lagrange(matrice, 5*res);
+      
+   elseif K==10
+      clf                  
+      hold on              
+      axis([-1 10 -1 10])
+      matrice=0;
+      for i=1:1000         
+         [X,Y]=ginput(1);  
+         if isempty(X)     
+            break
+         end
+         matrice(1,i)=X;   
+         matrice(2,i)=Y;   
+         plot(matrice(1,i),matrice(2,i),'o') % affichage du point de controle i
+         %plot(matrice(1,:),matrice(2,:),'b') % affichage du polygone de controle
+      end
+      
+      courbe_C2(matrice, resolution);
+      matricep = calcule_m(matrice, c, 0);
+      Hermite(matrice, matricep, resolution, 0);
+      Lagrange(matrice, resolution);
+      
+   elseif K==11
+      clf                  
+      hold on              
+      axis([-1 10 -1 10])
+      matrice=0;
+      for i=1:1000         
+         [X,Y]=ginput(1);  
+         if isempty(X)     
+            break
+         end
+         matrice(1,i)=X;   
+         matrice(2,i)=Y;   
+         plot(matrice(1,i),matrice(2,i),'o') % affichage du point de controle i
+         %plot(matrice(1,:),matrice(2,:),'b') % affichage du polygone de controle
+      end
+      
+      courbe_C2(matrice, resolution);
+      matricep = calcule_m(matrice, c, 0);
+      Hermite(matrice, matricep, resolution, 0);
+      %Lagrange(matrice, resolution);
+      matriced = transpose(calcule_points_aux(matrice));
+      hold on
+      figure 
+      courbure(matrice, matricep);
+      courbure(matrice, matriced);
+   end
+end
+close
